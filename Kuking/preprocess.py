@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 # --- ais_train.csv preprocessing ---
-def singleBoatCleanup(boat: pd.DataFrame, removeID: bool):
+def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
     """ 
     Input a Pandas dataframe of a single boat and output a cleaned version of the dataframe.
     """    
@@ -54,5 +54,29 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool):
 
     return boat
 
+def ais_trainCleanup(path: str, name: str):
+    """
+    Given path to ais_train.csv, return cleaned dataframe with given name "name".
+    """
 
+    ais_train = pd.read_csv(path)
+    pathPre = "/".join(path.split("/")[:-1]) + "/"
+    path_processed = pathPre + "/" + name
+
+    #Find all unique ships
+    uniqueVesselId = ais_train["vesselId"].unique()
+    ais_train_processed_list = []
+
+    for id in uniqueVesselId[0:5]:
+        #Isolate a single boat and clean
+        boat = ais_train[ais_train["vesselId"] == id]
+        boat = singleBoatCleanup(boat, False)
+
+        #Appending rows to list
+        for _, row in boat.iterrows():
+            ais_train_processed_list.append(row.to_dict())
+
+    ais_train_processed = pd.DataFrame(ais_train_processed_list).sort_values("time").reset_index(drop=True)
+
+    ais_train_processed.to_csv(path_processed, sep="|", index=False)
 
