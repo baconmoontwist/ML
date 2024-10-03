@@ -67,7 +67,7 @@ def ais_trainCleanup(path: str, name: str):
     uniqueVesselId = ais_train["vesselId"].unique()
     ais_train_processed_list = []
 
-    for id in uniqueVesselId[0:5]:
+    for id in uniqueVesselId:
         #Isolate a single boat and clean
         boat = ais_train[ais_train["vesselId"] == id]
         boat = singleBoatCleanup(boat, False)
