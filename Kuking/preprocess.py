@@ -59,7 +59,7 @@ def ais_trainCleanup(path: str, name: str):
     Given path to ais_train.csv, return cleaned dataframe with given name "name".
     """
 
-    ais_train = pd.read_csv(path)
+    ais_train = pd.read_csv(path, sep="|")
     pathPre = "/".join(path.split("/")[:-1]) + "/"
     path_processed = pathPre + "/" + name
 
