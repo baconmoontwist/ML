@@ -6,7 +6,7 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool):
     """ 
     Input a Pandas dataframe of a single boat and output a cleaned version of the dataframe.
     """    
-
+    #0-index everything
     boat.reset_index(drop=True, inplace=True)
     boat["time"] = boat["time"].astype("datetime64[ns]")
 
@@ -37,17 +37,17 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool):
 
     #Insh'allah
     boat["time_at_sea"] = boat["time"]-boat["timestamp_last_port"]
-    boat["time_at_sea"] = boat["time_at_sea"].apply(lambda x: x if x >= pd.Timedelta(0) else pd.Timedelta(0))
+    boat["time_at_sea"] = boat["time_at_sea"].apply(lambda x: x if x >= pd.to_datetime(0) else pd.to_datetime(0))
     boat = boat.drop(columns=["change", "timestamp_last_port"])
 
-    #etaRaw fixing
+    # --- etaRaw fixing ---
     boat["etaRaw"] = boat["etaRaw"].apply(lambda eta: "2024-" + eta)
     boat["etaRaw"] = pd.to_datetime(boat["etaRaw"], errors='coerce') #Set errors to NaT
     boat = boat.dropna(subset=["etaRaw"])
 
     boat["etaRaw"] = boat["etaRaw"].apply(lambda eta: pd.to_datetime(eta))
 
-    #Fixing pd.timestamp and pd.timedelta to numerical
+    # --- Fixing pd.timestamp and pd.timedelta to numerical ---
     boat["time"] = boat["time"].astype("int64") // (10**9)
     boat["etaRaw"] = boat["etaRaw"].astype("int64") // (10**9)
     boat["time_at_sea"] = boat["time_at_sea"].dt.total_seconds()
@@ -55,6 +55,4 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool):
     return boat
 
 
-def etaFix(boat: pd.DataFrame):
-    pass
 
