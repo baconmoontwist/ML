@@ -37,7 +37,7 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
 
     #Insh'allah
     boat["time_at_sea"] = boat["time"]-boat["timestamp_last_port"]
-    boat["time_at_sea"] = boat["time_at_sea"].apply(lambda x: x if x >= pd.Timestamp(0) else pd.Timestamp(0))
+    boat["time_at_sea"] = boat["time_at_sea"].apply(lambda x: x if x >= pd.Timedelta(0) else pd.Timedelta(0))
     boat = boat.drop(columns=["change", "timestamp_last_port"])
 
     # --- etaRaw fixing ---
