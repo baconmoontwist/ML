@@ -78,11 +78,8 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             boat.at[k,"speed"] = dist/tdddd*3600
             k+=1
             j=i
-<<<<<<< HEAD
-=======
 
     return boat
->>>>>>> 1fb6d9693b71b7dc22692883ac5a3c731b9074cf
 
 def ais_trainCleanup(path: str, name: str):
     """
