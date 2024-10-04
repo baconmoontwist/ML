@@ -54,7 +54,24 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
     boat["time"] = boat["time"].astype("int64") // (10**9)
     boat["etaRaw"] = boat["etaRaw"].astype("int64") // (10**9)
     boat["time_at_sea"] = boat["time_at_sea"].dt.total_seconds()
-
+    
+    #distanse 🤤🤤🤤
+    boat["dist_s_l"] = 0
+    boat["tot_dist"] = 0
+    k = 0
+    boat = boat.reset_index(drop = True)
+    for _,i in boat.iterrows():
+        if k==0:
+            k+=1
+            j=i
+        else:
+            min1 = j
+            min2 = i
+            dist = distance.geodesic((min2['latitude'],min2['longitude']),(min1['latitude'],min1['longitude'])).km
+            boat.at[k,"dist_s_l"] = dist
+            boat.at[k,"tot_dist"] = boat.at[k-1,"tot_dist"] + dist
+            k+=1
+            j=i
     return boat
 
 def ais_trainCleanup(path: str, name: str):
