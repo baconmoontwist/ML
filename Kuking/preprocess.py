@@ -56,7 +56,9 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
     boat["etaRaw"] = boat["etaRaw"].astype("int64") // (10**9)
     boat["time_at_sea"] = boat["time_at_sea"].dt.total_seconds() """
     
-    #distanse og fart 🤤🤤🤤
+    return boat
+
+def fart():
     boat["dist_s_l"] = 0
     boat["tot_dist"] = 0
     boat["time_s_l"] = 0
@@ -78,8 +80,6 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             boat.at[k,"speed"] = dist/tdddd*3600
             k+=1
             j=i
-
-    return boat
 
 def ais_trainCleanup(path: str, name: str):
     """
