@@ -58,7 +58,7 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
     
     return boat
 
-def fart():
+def fart(boat):
     boat["dist_s_l"] = 0
     boat["tot_dist"] = 0
     boat["time_s_l"] = 0

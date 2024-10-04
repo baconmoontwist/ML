@@ -52,11 +52,9 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
     boat["etaRaw"] = boat["etaRaw"].apply(lambda eta: pd.to_datetime(eta))
 
     # --- Fixing pd.timestamp and pd.timedelta to numerical ---
-    boat["time"] = boat["time"].astype("int64") // (10**9)
+    """ boat["time"] = boat["time"].astype("int64") // (10**9)
     boat["etaRaw"] = boat["etaRaw"].astype("int64") // (10**9)
-    boat["time_at_sea"] = boat["time_at_sea"].dt.total_seconds()
-    
-    #distanse og fart 🤤🤤🤤
+    boat["time_at_sea"] = boat["time_at_sea"].dt.total_seconds() """
     boat["dist_s_l"] = 0
     boat["tot_dist"] = 0
     boat["time_s_l"] = 0
@@ -78,7 +76,9 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             boat.at[k,"speed"] = dist/tdddd*3600
             k+=1
             j=i
+    return boat
 
+def fart(boat):
     return boat
 
 def ais_trainCleanup(path: str, name: str):
