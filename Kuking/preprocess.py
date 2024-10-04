@@ -3,6 +3,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import pandas as pd
 import numpy as np
+from geopy import distance
 
 # --- ais_train.csv preprocessing ---
 def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
@@ -72,6 +73,7 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             boat.at[k,"tot_dist"] = boat.at[k-1,"tot_dist"] + dist
             k+=1
             j=i
+
     return boat
 
 def ais_trainCleanup(path: str, name: str):
