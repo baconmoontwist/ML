@@ -79,10 +79,15 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             k+=1
             j=i
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
     return boat
 >>>>>>> 1fb6d9693b71b7dc22692883ac5a3c731b9074cf
+=======
+
+    return boat
+>>>>>>> bcca3ef764024446931c4ccd86ed9f1586a300e2
 
 def ais_trainCleanup(path: str, name: str):
     """
