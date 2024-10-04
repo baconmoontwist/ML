@@ -56,9 +56,11 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
     boat["etaRaw"] = boat["etaRaw"].astype("int64") // (10**9)
     boat["time_at_sea"] = boat["time_at_sea"].dt.total_seconds()
     
-    #distanse 🤤🤤🤤
+    #distanse og fart 🤤🤤🤤
     boat["dist_s_l"] = 0
     boat["tot_dist"] = 0
+    boat["time_s_l"] = 0
+    boat["speed"] = 0
     k = 0
     boat = boat.reset_index(drop = True)
     for _,i in boat.iterrows():
@@ -71,6 +73,9 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             dist = distance.geodesic((min2['latitude'],min2['longitude']),(min1['latitude'],min1['longitude'])).km
             boat.at[k,"dist_s_l"] = dist
             boat.at[k,"tot_dist"] = boat.at[k-1,"tot_dist"] + dist
+            tdddd = abs(j['time'].timestamp()-i['time'].timestamp())
+            boat.at[k,"time_s_l"] = tdddd
+            boat.at[k,"speed"] = dist/tdddd*3600
             k+=1
             j=i
 
