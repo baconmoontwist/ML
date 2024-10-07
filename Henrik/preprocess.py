@@ -73,7 +73,7 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             boat.at[k,"tot_dist"] = boat.at[k-1,"tot_dist"] + dist
             tdddd = abs(j['time'].timestamp()-i['time'].timestamp())
             boat.at[k,"time_s_l"] = tdddd
-            boat.at[k,"speed"] = dist/tdddd*3600
+            boat.at[k,"speed"] = min(dist/tdddd*3600,45)
             k+=1
             j=i
     return boat
