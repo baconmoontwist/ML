@@ -17,7 +17,7 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
     if removeID:
         boat = boat.drop(columns=["vesselId", "portId"])
 
-    boat["drift"] = boat["cog"] - boat["heading"]
+    boat["drift"] = (boat["cog"] - boat["heading"]+180)&360-180
 
     # --- Find last time we left a port ---
     #Figure out when navstat changes (2pac)
@@ -73,9 +73,14 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             boat.at[k,"tot_dist"] = boat.at[k-1,"tot_dist"] + dist
             tdddd = abs(j['time'].timestamp()-i['time'].timestamp())
             boat.at[k,"time_s_l"] = tdddd
-            boat.at[k,"speed"] = min(dist/tdddd*3600,45)
+            speed = dist/tdddd*3600
+            if speed > 75:
+                boat.at[k-1,"speed"] = np.nan
+                boat.at[k,"speed"] = 26
+            else: boat.at[k,"speed"] = speed
             k+=1
             j=i
+    boat=boat.dropna(subset=["speed"])
     return boat
 
 def fart(boat):
