@@ -242,4 +242,4 @@ def cleanUp(data: pd.DataFrame, n=688, resample=False, eta=False, time=False) ->
 
     return wallahi
 
-print("done")
+print("ya allah")
