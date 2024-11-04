@@ -105,6 +105,9 @@ def delta(boat: pd.DataFrame) -> pd.DataFrame:
     boat["delta_lat"] = boat["latitude"] - boat["latitude"].shift(1)
     boat["delta_lon"] = boat["longitude"] - boat["longitude"].shift(1)
 
+    boat["delta_lat_shift"] = boat["delta_lat"].shift(-1)
+    boat["delta_lon_shift"] = boat["delta_lon"].shift(-1)
+
     return boat
 
 def speed(boat: pd.DataFrame) -> pd.DataFrame:
@@ -130,30 +133,59 @@ def speed(boat: pd.DataFrame) -> pd.DataFrame:
     boat["speed_from_prev"] = (boat["dist_from_prev"] / (boat["delta_time"] / 3600))
     boat["speed_from_prev"].clip(lower=0, upper=max_speed, inplace=True)
 
+    boat["dist_cum"] = boat["dist_from_prev"].cumsum()
+
     return boat
 
 def moored(boat: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculate when we are at a port and then calculate the time at sea, set as seconds.
+    Calculate when we are at a port and then calculate the time at sea, set as seconds. 
+    Also calculate the distance from last port. Lastly, classify if boat is deep sea or not based on dist
     """
     boat["at_port"] = boat["navstat"].apply(lambda stat: True if stat == 5 else False)
     indices = boat[boat["at_port"] == True].index
 
     boat["timestamp_last_port"] = np.nan
+    boat["lat_port"] = np.nan
+    boat["lon_port"] = np.nan
 
     for i in indices:
         boat.at[i, "timestamp_last_port"] = boat.at[i, "time"]
+        boat.at[i, "lat_port"] = boat.at[i, "latitude"]
+        boat.at[i, "lon_port"] = boat.at[i, "longitude"]
 
     boat["timestamp_last_port"] = boat["timestamp_last_port"].ffill()
+    boat["lat_port"] = boat["lat_port"].ffill()
+    boat["lon_port"] = boat["lon_port"].ffill()
 
     origin = boat.at[0, "time"]
+    origin_lat, origin_lon = boat.at[0, "latitude"], boat.at[0, "longitude"]
     boat["timestamp_last_port"] = boat["timestamp_last_port"].fillna(origin)
+    boat["lat_port"] = boat["lat_port"].fillna(origin_lat)
+    boat["lon_port"] = boat["lon_port"].fillna(origin_lon)
 
     #Insh'allah
     boat["time_at_sea"] = boat["time"]-boat["timestamp_last_port"]
     boat["time_at_sea"] = boat["time_at_sea"].apply(lambda x: x if x >= pd.Timedelta(0) else pd.Timedelta(0))
     boat["time_at_sea"] = boat["time_at_sea"].dt.total_seconds()
-    boat = boat.drop(columns=["timestamp_last_port"])
+
+    #Distance since last port
+    l = len(boat)
+    boat["dist_last_port"] = np.nan
+
+    for i in range(1,l):
+        dist = distance((boat.at[i, "latitude"], boat.at[i, "longitude"]),
+                        (boat.at[i, "lat_port"], boat.at[i, "lon_port"])).km
+        
+        boat.at[i, "dist_last_port"] = dist
+
+    #Deep sea?
+    boat["deep_sea"] = 0
+    
+    if boat["dist_last_port"].max() > 100:
+        boat["deep_sea"] = 1
+
+    boat = boat.drop(columns=["timestamp_last_port", "lat_port", "lon_port"])
 
     return boat
 
@@ -186,6 +218,27 @@ def resample(boat: pd.DataFrame) -> pd.DataFrame:
 
     return boat
 
+def lagged(bruh: pd.DataFrame) -> pd.DataFrame:
+    #Delta Lat/lon
+
+    for i in range(1,6):
+        bruh[f"delta_lat_lag_{i}"] = bruh["delta_lat"].shift(i)
+        bruh[f"delta_lon_lag_{i}"] = bruh["delta_lon"].shift(i) 
+
+    #Speed and distance
+    # bruh["speed_lag_1"] = bruh["speed_from_prev"].shift(1)
+    # bruh["speed_lag_2"] = bruh["speed_from_prev"].shift(2)
+
+    # bruh["dist_lag_1"] = bruh["dist_from_prev"].shift(1)
+    # bruh["dist_lag_2"] = bruh["dist_from_prev"].shift(2)
+
+    #NAVSTAT
+    # bruh["navstat_lag_1"] = bruh["navstat"].shift(1)
+    # bruh["navstat_lag_2"] = bruh["navstat"].shift(2)
+
+    bruh.dropna(inplace=True)
+    return bruh
+
 def cleanUp(data: pd.DataFrame, n=688, resample=False, eta=False, time=False) -> pd.DataFrame:
     """
     data: smirk, n: how many boats to clean, resample: smirk, eta: smrk, time: fix time or no?
@@ -205,7 +258,7 @@ def cleanUp(data: pd.DataFrame, n=688, resample=False, eta=False, time=False) ->
         if resample:
             boat = resample(boat)    
 
-        boat = navstat(speed(delta(moored(boat))))
+        boat = lagged(navstat(speed(delta(moored(boat)))))
 
         for _, row in boat.iterrows():
             wallahi.append(row.to_dict())
