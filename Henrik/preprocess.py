@@ -17,7 +17,7 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
     if removeID:
         boat = boat.drop(columns=["vesselId", "portId"])
 
-    boat["drift"] = (boat["cog"] - boat["heading"]+180)&360-180
+    boat["drift"] = (boat["cog"] - boat["heading"]+180)%360-180
 
     # --- Find last time we left a port ---
     #Figure out when navstat changes (2pac)
@@ -81,10 +81,25 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             k+=1
             j=i
     boat=boat.dropna(subset=["speed"])
+    boat=deltafier(boat)
     return boat
 
-def fart(boat):
-    return boat
+def deltafier(df):
+    data = df.copy()
+    data["delta_lat"] = data["latitude"]-data["latitude"].shift(1)
+    data["delta_lon"] = (data["longitude"]-data["longitude"].shift(1)+180)%360-180
+    data["delta_time"] = timefix(data)["time"]-timefix(data)["time"].shift(1)
+    data["last_lon"] = data["longitude"].shift(1)
+    data["last_lat"] = data["latitude"].shift(1)
+    return data[1:]
+
+def timefix(df):
+    data = df.copy()
+    time3 = []
+    for i in data['time']:
+        time3.append(int(i.timestamp()-1704067200))
+    data['time'] = np.array(time3, dtype = 'float32')
+    return data
 
 def ais_trainCleanup(path: str, name: str):
     """
