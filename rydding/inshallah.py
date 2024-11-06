@@ -105,8 +105,8 @@ def delta(boat: pd.DataFrame) -> pd.DataFrame:
     boat["delta_lat"] = boat["latitude"] - boat["latitude"].shift(1)
     boat["delta_lon"] = boat["longitude"] - boat["longitude"].shift(1)
 
-    boat["delta_lat_shift"] = boat["delta_lat"].shift(-1)
-    boat["delta_lon_shift"] = boat["delta_lon"].shift(-1)
+    boat["delta_lat_cum"] = boat["delta_lat"].cumsum()
+    boat["delta_lon_cum"] = boat["delta_lon"].cumsum()
 
     return boat
 
@@ -221,7 +221,7 @@ def resample(boat: pd.DataFrame) -> pd.DataFrame:
 def lagged(bruh: pd.DataFrame) -> pd.DataFrame:
     #Delta Lat/lon
 
-    for i in range(1,6):
+    for i in range(1,2):
         bruh[f"delta_lat_lag_{i}"] = bruh["delta_lat"].shift(i)
         bruh[f"delta_lon_lag_{i}"] = bruh["delta_lon"].shift(i) 
 
