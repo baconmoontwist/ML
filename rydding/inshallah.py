@@ -225,9 +225,13 @@ def resample(boat: pd.DataFrame) -> pd.DataFrame:
 def lagged(bruh: pd.DataFrame) -> pd.DataFrame:
     #Delta Lat/lon
 
-    for i in range(1,2):
+    for i in range(1,6):
         bruh[f"delta_lat_lag_{i}"] = bruh["delta_lat"].shift(i)
         bruh[f"delta_lon_lag_{i}"] = bruh["delta_lon"].shift(i) 
+
+    for i in range(1,6):
+        bruh[f"lat_lag_{i}"] = bruh["latitude"].shift(i)
+        bruh[f"lon_lag_{i}"] = bruh["longitude"].shift(i) 
 
     #Speed and distance
     # bruh["speed_lag_1"] = bruh["speed_from_prev"].shift(1)
