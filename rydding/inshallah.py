@@ -227,22 +227,10 @@ def lagged(bruh: pd.DataFrame) -> pd.DataFrame:
 
     for i in range(1,6):
         bruh[f"delta_lat_lag_{i}"] = bruh["delta_lat"].shift(i)
-        bruh[f"delta_lon_lag_{i}"] = bruh["delta_lon"].shift(i) 
-
-    for i in range(1,6):
+        bruh[f"delta_lon_lag_{i}"] = bruh["delta_lon"].shift(i)
+        
         bruh[f"lat_lag_{i}"] = bruh["latitude"].shift(i)
-        bruh[f"lon_lag_{i}"] = bruh["longitude"].shift(i) 
-
-    #Speed and distance
-    # bruh["speed_lag_1"] = bruh["speed_from_prev"].shift(1)
-    # bruh["speed_lag_2"] = bruh["speed_from_prev"].shift(2)
-
-    # bruh["dist_lag_1"] = bruh["dist_from_prev"].shift(1)
-    # bruh["dist_lag_2"] = bruh["dist_from_prev"].shift(2)
-
-    #NAVSTAT
-    # bruh["navstat_lag_1"] = bruh["navstat"].shift(1)
-    # bruh["navstat_lag_2"] = bruh["navstat"].shift(2)
+        bruh[f"lon_lag_{i}"] = bruh["longitude"].shift(i)
 
     bruh.dropna(inplace=True)
     return bruh
