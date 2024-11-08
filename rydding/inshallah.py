@@ -108,6 +108,10 @@ def delta(boat: pd.DataFrame) -> pd.DataFrame:
     boat["delta_lat_cum"] = boat["delta_lat"].cumsum()
     boat["delta_lon_cum"] = boat["delta_lon"].cumsum()
 
+    #Degree stuff
+    boat["cog"] = (boat["cog"] * np.pi )/180
+    boat["heading"] = (boat["heading"] * np.pi)/180
+
     return boat
 
 def speed(boat: pd.DataFrame) -> pd.DataFrame:
@@ -239,7 +243,7 @@ def lagged(bruh: pd.DataFrame) -> pd.DataFrame:
     bruh.dropna(inplace=True)
     return bruh
 
-def cleanUp(data: pd.DataFrame, n=689, resample=False, eta=False, time=False) -> pd.DataFrame:
+def cleanUp(data: pd.DataFrame, n=688, resample=False, eta=False, time=False) -> pd.DataFrame:
     """
     data: smirk, n: how many boats to clean, resample: smirk, eta: smrk, time: fix time or no?
     """
@@ -252,8 +256,8 @@ def cleanUp(data: pd.DataFrame, n=689, resample=False, eta=False, time=False) ->
     #Individual boat stuff
     ids = data["vesselId"].unique()
 
-    for id in ids[:n]:
-        boat = data[data["vesselId"] == id].reset_index(drop=True)
+    for i in ids[:n+1]:
+        boat = data[data["vesselId"] == i].reset_index(drop=True)
 
         if resample:
             boat = resample(boat)    
@@ -264,10 +268,6 @@ def cleanUp(data: pd.DataFrame, n=689, resample=False, eta=False, time=False) ->
             wallahi.append(row.to_dict())
 
     wallahi = pd.DataFrame(wallahi)
-
-    #Degree stuff
-    wallahi["cog"] = (wallahi["cog"] * np.pi )/180
-    wallahi["heading"] = (data["heading"] * np.pi)/180
 
     #Fix etaRaw: Set to seconds from 2024-01-01 00:00:00 if possible, if invalid set to pd.NaT and then interpolat
     #using nearest()
