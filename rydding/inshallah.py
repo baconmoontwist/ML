@@ -239,7 +239,7 @@ def lagged(bruh: pd.DataFrame) -> pd.DataFrame:
     bruh.dropna(inplace=True)
     return bruh
 
-def cleanUp(data: pd.DataFrame, n=688, resample=False, eta=False, time=False) -> pd.DataFrame:
+def cleanUp(data: pd.DataFrame, n=689, resample=False, eta=False, time=False) -> pd.DataFrame:
     """
     data: smirk, n: how many boats to clean, resample: smirk, eta: smrk, time: fix time or no?
     """
