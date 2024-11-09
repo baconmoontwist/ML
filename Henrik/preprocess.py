@@ -81,6 +81,7 @@ def singleBoatCleanup(boat: pd.DataFrame, removeID: bool) -> pd.DataFrame:
             k+=1
             j=i
     boat=boat.dropna(subset=["speed"])
+    boat["speed_lag"] = boat["speed"].shift(1)
     boat=deltafier(boat)
     return boat
 
